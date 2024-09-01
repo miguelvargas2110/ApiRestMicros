@@ -14,7 +14,7 @@ ENV SPRING_DATASOURCE_USERNAME=postgres
 ENV SPRING_DATASOURCE_PASSWORD=ROOT
 
 # Exponer el puerto que utiliza la aplicación
-EXPOSE 8080
+EXPOSE 8001
 
 # Comando para ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "/app/TallerApiRest.jar"]
