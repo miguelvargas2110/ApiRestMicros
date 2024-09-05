@@ -21,7 +21,7 @@ public class JwtService {
     public String getToken(User user, Map<String, Object> extraClaims) {
         // Construir el token JWT
         return Jwts.builder()
-
+                .setClaims(extraClaims)
                 .setSubject(user.getUsername())
                 .setIssuer("ingesis.uniquindio.edu.co")
                 .setIssuedAt(new Date())
@@ -30,9 +30,26 @@ public class JwtService {
                 .compact();
     }
 
+    public String getChangePasswordToken(User user) {
+        // Construir el token JWT
+        return Jwts.builder()
+                .setClaims(Map.of("changePassword", true))
+                .setSubject(user.getUsername())
+                .setIssuer("ingesis.uniquindio.edu.co")
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 600000)) // 10 minutos de expiración
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
+    }
+
     public boolean isTokenValid(String token, String username){
         return getSubject(token).equals(username) && getIssuer(token).equals("ingesis.uniquindio.edu.co")
                 && !isTokenExpired(token);
+    }
+
+    public boolean isChangePasswordTokenValid(String token){
+        return getIssuer(token).equals("ingesis.uniquindio.edu.co")
+                && !isTokenExpired(token) && getClaim(token, claims -> claims.get("changePassword", Boolean.class));
     }
 
     public String getSubject(String token){

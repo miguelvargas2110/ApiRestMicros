@@ -19,7 +19,7 @@ public class AuthenticationServiceImpl {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UsuarioServiceImpl userRepository;
+    private UserServiceImpl userRepository;
 
     @Autowired
     private JwtService jwtService;
@@ -42,6 +42,7 @@ public class AuthenticationServiceImpl {
     private Map<String, Object> generateExtraClaims(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("permissions", user.getAuthorities());
+        extraClaims.put("changePassword", false);
         return extraClaims;
     }
 

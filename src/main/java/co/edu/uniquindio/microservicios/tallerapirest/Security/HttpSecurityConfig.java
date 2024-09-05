@@ -39,6 +39,7 @@ public class HttpSecurityConfig {
     private static Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> builderRequestMatchers() {
         return authConfig -> {
             authConfig.requestMatchers(HttpMethod.POST, "/login").permitAll();
+            authConfig.requestMatchers(HttpMethod.POST, "/signup").permitAll();
             authConfig.requestMatchers("/error").permitAll();
             authConfig.anyRequest().denyAll();
         };
