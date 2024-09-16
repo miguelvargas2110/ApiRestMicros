@@ -1,0 +1,21 @@
+Feature: Operaciones CRUD de Usuarios
+  Como usuario de la API
+  Quiero gestionar usuarios (crear, leer, actualizar, eliminar) AND realizar autenticación
+  Para poder mantener los datos de los usuarios AND asegurar el acceso
+
+  Background:
+    GIVEN que el servidor está en ejecución
+
+  Scenario: Inicio de sesión exitoso del usuario
+    GIVEN un usuario con credenciales válidas
+    WHEN se envía una solicitud de autenticacion con esas credenciales
+    THEN el estado de la respuesta debe ser 200
+    AND se debe devolver un token JWT
+
+  Scenario: Inicio de sesión fallido del usuario con credenciales inválidas
+    GIVEN un usuario con credenciales inválidas
+    WHEN se envía una solicitud de autenticacion con esas credenciales
+    THEN el estado de la respuesta debe ser 401
+    AND el mensaje de error debe ser "Usuario o contraseña no validos"
+
+

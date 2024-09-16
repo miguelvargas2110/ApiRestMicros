@@ -27,24 +27,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = this.getTokenFromRequest(request);
         String username = request.getParameter("username");
+
         try {
-            if(request.getServletPath().equals("/login") || request.getServletPath().equals("/signup") || request.getServletPath().equals("/generateChangePasswordToken") || request.getServletPath().equals("/users")) {
+            String servletPath = request.getServletPath();
+
+            // Permitir acceso sin autenticación a rutas específicas
+            if (servletPath.equals("/login") ||
+                    servletPath.equals("/signup") ||
+                    servletPath.equals("/generateChangePasswordToken") ||
+                    servletPath.equals("/users") ||
+                    servletPath.startsWith("/swagger-ui") ||
+                    servletPath.startsWith("/v3/api-docs")) { // Ampliar condición para incluir todas las rutas de Swagger UI
+
                 filterChain.doFilter(request, response);
-            } else if (request.getServletPath().equals("/changePassword")) {
-                if (jwtService.isChangePasswordTokenValid(token)) {
-                    filterChain.doFilter(request, response);
-                } else {
-                    // Error de token inválido para cambiar contraseña
-                    setUnauthorizedResponse(response, "Error: Usuario no autorizado.", request);
-                }
-            } else {
-                if (jwtService.isTokenValid(token, username)) {
-                    filterChain.doFilter(request, response);
-                } else {
-                    // Error de token inválido
-                    setUnauthorizedResponse(response, "Error: Usuario no autorizado.", request);
-                }
+                return;
             }
+
+            // Manejo especial para la ruta de cambio de contraseña
+            if (servletPath.equals("/changePassword")) {
+                if (token != null && jwtService.isChangePasswordTokenValid(token)) {
+                    filterChain.doFilter(request, response);
+                } else {
+                    setUnauthorizedResponse(response, "Error: Usuario no autorizado.", request);
+                }
+                return;
+            }
+
+            // Validación para otras rutas
+            if (token != null && jwtService.isTokenValid(token, username)) {
+                filterChain.doFilter(request, response);
+            } else {
+                setUnauthorizedResponse(response, "Error: Usuario no autorizado.", request);
+            }
+
         } catch (ExpiredJwtException e) {
             // Token expirado
             setUnauthorizedResponse(response, "Error: El token ha expirado.", request);

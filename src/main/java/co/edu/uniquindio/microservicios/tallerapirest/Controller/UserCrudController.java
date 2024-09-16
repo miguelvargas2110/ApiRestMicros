@@ -42,7 +42,7 @@ public class UserCrudController {
     //--------------------------------------------------------------------------------
 
     @PostMapping("/login")
-    @PreAuthorize("permitAll")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<?> login(@RequestBody LoginDTO authRequest, HttpServletRequest request) {
         try {
             AuthenticationResponse jwtDto = authenticationService.login(authRequest);
@@ -86,7 +86,7 @@ public class UserCrudController {
         return ResponseEntity.ok(saludoHtml);
     }
 
-    @DeleteMapping("/deleteUser")
+    @DeleteMapping("/user")
     public ResponseEntity<?> deleteUser(@RequestParam(value = "username", required = false) String username, HttpServletRequest request) {
         try {
             Optional<User> userOptional = userServiceImpl.searchByUserName(username);
@@ -143,17 +143,21 @@ public class UserCrudController {
         }
     }
 
-    @PutMapping("/updateUser")
+    @PutMapping("/user")
     public ResponseEntity<?> updateUser(@ModelAttribute UpdateDTO updateDTO) {
         try {
             User user = userServiceImpl.searchByUserName(updateDTO.username()).get();
             if ((updateDTO.email() != null && !updateDTO.email().isEmpty()) || (updateDTO.password() != null && !updateDTO.password().isEmpty())) {
-                user.setEmail(updateDTO.email());
-                user.setPassword(passwordEncoder.encode(updateDTO.password()));
+                if(updateDTO.email() != null && !updateDTO.email().isEmpty()){
+                    user.setEmail(updateDTO.email());
+                }
+                if(updateDTO.password() != null && !updateDTO.password().isEmpty()){
+                    user.setPassword(passwordEncoder.encode(updateDTO.password()));
+                }
             }else {
                 ApiError apiError = new ApiError(
-                        HttpStatus.NO_CONTENT.value(),
-                        HttpStatus.NO_CONTENT.getReasonPhrase(),
+                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
                         "Ambos datos a actualizar son nulos",
                         "/signup"
                 );
@@ -240,12 +244,12 @@ public class UserCrudController {
             return ResponseEntity.ok(userServiceImpl.obtenerEntidadesPaginadas(numeroPagina, tamanoPagina));
         } catch (Exception e) {
             ApiError apiError = new ApiError(
-                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
                     "Error al obtener los usuarios paginados.",
                     "/users"
             );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
         }
     }
 

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ErrorController {
 
-    @RequestMapping("/**")
+    //@RequestMapping("/**")
     public ResponseEntity<String> handle404() {
         String notFoundHtml = "<html><body><h2>Recurso no encontrado</h2></body></html>";
         return ResponseEntity
