@@ -120,9 +120,12 @@ public class UserCrudController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody User user) throws Exception {
+    public ResponseEntity<?> signUp(@RequestBody SignUpDTO signUpDTO){
         try {
-            String password = user.getPassword();
+            String password = signUpDTO.password();
+            User user = new User();
+            user.setUsername(signUpDTO.username());
+            user.setEmail(signUpDTO.email());
             user.setPassword(passwordEncoder.encode(password));
             userServiceImpl.save(user);
             ApiSuccess apiSuccess = new ApiSuccess(
@@ -200,7 +203,7 @@ public class UserCrudController {
             ApiError apiError = new ApiError(
                     HttpStatus.NOT_FOUND.value(),
                     HttpStatus.NOT_FOUND.getReasonPhrase(),
-                    "Usuario no encontrado.",
+                    "Usuario no encontrado",
                     "/generateChangePasswordToken"
             );
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
@@ -232,7 +235,7 @@ public class UserCrudController {
             ApiError apiError = new ApiError(
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                    "Error al cambiar la contraseña.",
+                    "Error al cambiar la contraseña",
                     "/changePassword"
             );
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);        }
@@ -241,6 +244,15 @@ public class UserCrudController {
     @GetMapping("/users")
     public ResponseEntity<?> obtenerEntidadesPaginadas(@RequestParam(value = "numeroPagina", required = false) int numeroPagina, @RequestParam(value = "tamanoPagina", required = false) int tamanoPagina) {
         try {
+            if(numeroPagina < 0 && tamanoPagina < 0){
+                ApiError apiError = new ApiError(
+                        HttpStatus.BAD_REQUEST.value(),
+                        HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                        "No se pueden dar valores negativos",
+                        "/users"
+                );
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+            }
             return ResponseEntity.ok(userServiceImpl.obtenerEntidadesPaginadas(numeroPagina, tamanoPagina));
         } catch (Exception e) {
             ApiError apiError = new ApiError(

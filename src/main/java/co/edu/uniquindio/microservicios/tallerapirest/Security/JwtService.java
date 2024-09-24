@@ -47,8 +47,8 @@ public class JwtService {
                 && !isTokenExpired(token);
     }
 
-    public boolean isChangePasswordTokenValid(String token){
-        return getIssuer(token).equals("ingesis.uniquindio.edu.co")
+    public boolean isChangePasswordTokenValid(String token, String username){
+        return getSubject(token).equals(username) && getIssuer(token).equals("ingesis.uniquindio.edu.co")
                 && !isTokenExpired(token) && getClaim(token, claims -> claims.get("changePassword", Boolean.class));
     }
 

@@ -1,4 +1,4 @@
-Feature: Operaciones CRUD de Usuarios
+Feature: Operaciones Login de Usuarios
   Como usuario de la API
   Quiero gestionar usuarios (crear, leer, actualizar, eliminar) And realizar autenticación
   Para poder mantener los datos de los usuarios And asegurar el acceso

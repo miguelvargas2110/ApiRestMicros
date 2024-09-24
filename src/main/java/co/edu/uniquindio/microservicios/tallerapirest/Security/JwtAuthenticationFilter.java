@@ -45,10 +45,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // Manejo especial para la ruta de cambio de contraseña
             if (servletPath.equals("/changePassword")) {
-                if (token != null && jwtService.isChangePasswordTokenValid(token)) {
+                if (token != null && jwtService.isChangePasswordTokenValid(token, username)) {
                     filterChain.doFilter(request, response);
                 } else {
-                    setUnauthorizedResponse(response, "Error: Usuario no autorizado.", request);
+                    setUnauthorizedResponse(response, "Error: Usuario no autorizado", request);
                 }
                 return;
             }
@@ -57,12 +57,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (token != null && jwtService.isTokenValid(token, username)) {
                 filterChain.doFilter(request, response);
             } else {
-                setUnauthorizedResponse(response, "Error: Usuario no autorizado.", request);
+                setUnauthorizedResponse(response, "Error: Usuario no autorizado", request);
             }
 
         } catch (ExpiredJwtException e) {
             // Token expirado
-            setUnauthorizedResponse(response, "Error: El token ha expirado.", request);
+            setUnauthorizedResponse(response, "Error: El token ha expirado", request);
         }
     }
 
