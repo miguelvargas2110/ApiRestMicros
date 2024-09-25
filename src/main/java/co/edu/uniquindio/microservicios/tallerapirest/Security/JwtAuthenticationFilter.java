@@ -37,7 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     servletPath.equals("/generateChangePasswordToken") ||
                     servletPath.equals("/users") ||
                     servletPath.startsWith("/swagger-ui") ||
-                    servletPath.startsWith("/v3/api-docs")) { // Ampliar condición para incluir todas las rutas de Swagger UI
+                    servletPath.startsWith("/v3/api-docs") ||
+                    servletPath.equals("/resetPassword")) { // Ampliar condición para incluir todas las rutas de Swagger UI
 
                 filterChain.doFilter(request, response);
                 return;

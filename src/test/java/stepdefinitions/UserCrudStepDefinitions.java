@@ -1,19 +1,11 @@
 package stepdefinitions;
 
-import co.edu.uniquindio.microservicios.tallerapirest.Entities.User;
-import co.edu.uniquindio.microservicios.tallerapirest.Repositories.UserRepository;
-import co.edu.uniquindio.microservicios.tallerapirest.Services.UserServiceImpl;
+
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -21,13 +13,10 @@ import java.util.Optional;
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest()
 @Transactional
 public class UserCrudStepDefinitions {
 
-    @MockBean
-    private UserServiceImpl userServiceImpl;
-
+    UserDatabaseUtil userDatabaseUtil = new UserDatabaseUtil();
     private String baseUrl = "http://localhost:8001";
     private Response response;
     private String username = "";
@@ -146,11 +135,6 @@ public class UserCrudStepDefinitions {
         username = "Ortiz";
     }
 
-    @And("intenta eliminar un usuario no existente")
-    public void intentaEliminarUnUsuarioNoExistente() {
-        username = "Ortiz";
-    }
-
     @And("intenta eliminar otro usuario")
     public void intentaEliminarOtroUsuario() {
         username = "Tunubala";
@@ -239,7 +223,7 @@ public class UserCrudStepDefinitions {
     public void unUsuarioValidoParaHacerElCambioDeContraseña() {
         username = "Ortiz";
         password = "1234566";
-        token = "eyJhbGciOiJIUzI1NiJ9.eyJjaGFuZ2VQYXNzd29yZCI6dHJ1ZSwic3ViIjoiT3J0aXoiLCJpc3MiOiJpbmdlc2lzLnVuaXF1aW5kaW8uZWR1LmNvIiwiaWF0IjoxNzI2NzYwNDQzLCJleHAiOjE3MjY3NjEwNDN9.Oz2Wb4mZXsIZx47HksD-9C3dqfuL55DoC2ktaq7fCEg";
+        generarTokenCambio();
     }
 
 
@@ -247,7 +231,7 @@ public class UserCrudStepDefinitions {
     public void unUsuarioInvalidoParaHacerElCambioDeContraseña() {
         username = "Tunubala";
         password = "1234";
-        token = "eyJhbGciOiJIUzI1NiJ9.eyJjaGFuZ2VQYXNzd29yZCI6dHJ1ZSwic3ViIjoiT3J0aXoiLCJpc3MiOiJpbmdlc2lzLnVuaXF1aW5kaW8uZWR1LmNvIiwiaWF0IjoxNzI2NzYwNDQzLCJleHAiOjE3MjY3NjEwNDN9.Oz2Wb4mZXsIZx47HksD-9C3dqfuL55DoC2ktaq7fCEg";
+        generarTokenCambio();
     }
 
     @When("se envía una solicitud de cambio de contraseña con una nueva contraseña")
@@ -273,26 +257,26 @@ public class UserCrudStepDefinitions {
     }
 
     public void verificarUsuarioNoE(){
-        Optional<User> userOptional = userServiceImpl.searchByUserName("Ortiz");
-        if(userOptional.isEmpty()){
+        boolean existe = userDatabaseUtil.verificarUsuarioExiste("Ortiz");
+        if(!existe){
             crearUsuario();
+        }else{
+            restablecerContraseña("1234");
         }
         generarToken();
     }
 
     public void verificarUsuarioE(){
-        Optional<User> userOptional = userServiceImpl.searchByUserName("Ortiz");
-        if(userOptional.isPresent()){
+        boolean existe = userDatabaseUtil.verificarUsuarioExiste("Ortiz");
+        if(existe){
             generarToken();
             borrarUsuario();
         }
     }
 
     public void generarToken(){
-        Optional<User> userOptional = userServiceImpl.searchByUserName("Ortiz");
-        username = "Ortiz";
-        password = userOptional.get().getPassword();
-        String body = "{ \"username\": \"" + username + "\", \"password\": \"" + password + "\" }";
+
+        String body = "{ \"username\": \"Ortiz\", \"password\": \"1234\" }";
 
         response = given()
                 .contentType("application/json")
@@ -301,5 +285,23 @@ public class UserCrudStepDefinitions {
 
         token = response.jsonPath().getString("jwt");
     }
+
+    public void generarTokenCambio(){
+        response = given()
+                .contentType("multipart/form-data")
+                .multiPart("username", "Ortiz")
+                .post(baseUrl + "/generateChangePasswordToken");
+        token = response.jsonPath().getString("jwt");
+    }
+
+    public void restablecerContraseña(String newPassword) {
+        // Aquí realizas la solicitud para cambiar la contraseña sin autenticación
+        response = given()
+                .contentType("multipart/form-data")
+                .multiPart("password", newPassword)
+                .post(baseUrl + "/resetPassword");  // Cambia a la ruta que maneje restablecimiento de contraseñas
+    }
+
+
 
 }

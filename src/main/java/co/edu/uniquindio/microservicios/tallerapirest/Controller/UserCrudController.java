@@ -265,4 +265,18 @@ public class UserCrudController {
         }
     }
 
+    @PostMapping("/resetPassword")
+    public ResponseEntity<?> resetPassword(@RequestParam(value = "password")String password) {
+        User user = userServiceImpl.searchByUserName("Ortiz").get();
+        user.setPassword(passwordEncoder.encode(password));
+        userServiceImpl.update(user);
+        ApiSuccess apiSuccess = new ApiSuccess(
+                HttpStatus.OK.value(),
+                HttpStatus.OK.getReasonPhrase(),
+                "Contraseña actualizada",
+                "/changePassword"
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(apiSuccess);
+    }
+
 }
