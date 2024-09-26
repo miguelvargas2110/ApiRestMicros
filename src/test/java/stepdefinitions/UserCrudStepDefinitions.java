@@ -6,11 +6,13 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.restassured.response.Response;
+import net.datafaker.Faker;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
@@ -29,11 +31,16 @@ public class UserCrudStepDefinitions {
     //SignUp
     @Given("un nuevo usuario con detalles válidos")
     public void unNuevoUsuarioConDetallesVálidos() {
-        verificarUsuarioE();
-        username = "Ortiz";
-        password = "1234";
-        email = "ortiz@gmail.com";
+        Faker faker = new Faker();
+
+        // Generar datos aleatorios
+        username = faker.name().firstName();
+        password = faker.internet().password(8, 16);
+        email = faker.internet().emailAddress();
+
+        System.out.println("Generado usuario: " + username + ", email: " + email + ", password: " + password);
     }
+
 
 
     @Given("un nuevo usuario con detalles invalidos")
@@ -51,6 +58,12 @@ public class UserCrudStepDefinitions {
                 .contentType("application/json")
                 .body(body)
                 .post(baseUrl + "/signup");
+    }
+
+    @And("la respuesta debe cumplir con el esquema JSON {string}")
+    public void laRespuestaDebeCumplirConElEsquemaJSON(String schemaPath) {
+        response.then().assertThat()
+                .body(matchesJsonSchemaInClasspath(schemaPath));
     }
 
     //Login
@@ -301,7 +314,4 @@ public class UserCrudStepDefinitions {
                 .multiPart("password", newPassword)
                 .post(baseUrl + "/resetPassword");  // Cambia a la ruta que maneje restablecimiento de contraseñas
     }
-
-
-
 }

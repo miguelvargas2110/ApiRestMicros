@@ -9,6 +9,7 @@ import co.edu.uniquindio.microservicios.tallerapirest.Services.AuthenticationSer
 import co.edu.uniquindio.microservicios.tallerapirest.Services.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -70,7 +71,8 @@ public class UserCrudController {
                     "Ocurrió un error interno",
                     request.getRequestURI()
             );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);        }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
+        }
     }
 
     @GetMapping("/saludo")
@@ -120,7 +122,7 @@ public class UserCrudController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody SignUpDTO signUpDTO){
+    public ResponseEntity<?> signUp(@RequestBody SignUpDTO signUpDTO) {
         try {
             String password = signUpDTO.password();
             User user = new User();
@@ -135,6 +137,14 @@ public class UserCrudController {
                     "/signup"
             );
             return ResponseEntity.status(HttpStatus.OK).body(apiSuccess);
+        } catch (DataIntegrityViolationException e) {
+            ApiError apiError = new ApiError(
+                    HttpStatus.BAD_REQUEST.value(),
+                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                    "Este usuario ya existe",
+                    "/signup"
+            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
         } catch (Exception e) {
             ApiError apiError = new ApiError(
                     HttpStatus.BAD_REQUEST.value(),
@@ -145,6 +155,7 @@ public class UserCrudController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
         }
     }
+
 
     @PutMapping("/user")
     public ResponseEntity<?> updateUser(@ModelAttribute UpdateDTO updateDTO) {

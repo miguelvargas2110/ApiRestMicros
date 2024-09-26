@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserDatabaseUtil {
+public class    UserDatabaseUtil {
 
     private static final String URL = "jdbc:postgresql://localhost:5432/tallerApiRest";
     private static final String USER = "postgres";
