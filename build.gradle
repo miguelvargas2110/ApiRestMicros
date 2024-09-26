@@ -44,6 +44,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework:spring-test'
     testImplementation 'io.rest-assured:json-schema-validator:5.5.0'
+    testImplementation 'net.masterthought:cucumber-reporting:5.8.2'
 
     runtimeOnly 'org.postgresql:postgresql'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'

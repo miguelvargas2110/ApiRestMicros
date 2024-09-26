@@ -45,7 +45,8 @@ public class UserCrudStepDefinitions {
 
     @Given("un nuevo usuario con detalles invalidos")
     public void unNuevoUsuarioConDetallesInvalidos() {
-        username = "Tunubala";
+        verificarUsuarioNoE();
+        username = "Ortiz";
         password = "123456";
         email = "ortiz@gmail.com";
     }
