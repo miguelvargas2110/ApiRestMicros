@@ -1,8 +1,8 @@
 pipeline {
     agent any
     environment {
-        APP_REPO_URL = 'https://github.com/usuario/app-repo.git'    // URL del repo de la aplicación
-        TEST_REPO_URL = 'https://github.com/usuario/test-repo.git'  // URL del repo de las pruebas
+        APP_REPO_URL = 'https://github.com/miguelvargas2110/ApiRestMicros.git'    // URL del repo de la aplicación
+        TEST_REPO_URL = 'https://github.com/miguelvargas2110/AutomatizationTest.git'  // URL del repo de las pruebas
         APP_DIR = 'app-dir'   // Directorio donde clonarás el repo de la aplicación
         TEST_DIR = 'test-dir' // Directorio donde clonarás el repo de pruebas
     }
@@ -11,11 +11,11 @@ pipeline {
             steps {
                 // Clonando el repositorio de la aplicación
                 dir(APP_DIR) {
-                    git url: "${APP_REPO_URL}", branch: 'main'  // Cambia la rama según sea necesario
+                    git url: "${APP_REPO_URL}", branch: 'master'  // Cambia la rama según sea necesario
                 }
                 // Clonando el repositorio de pruebas
                 dir(TEST_DIR) {
-                    git url: "${TEST_REPO_URL}", branch: 'main'
+                    git url: "${TEST_REPO_URL}", branch: 'master'
                 }
             }
         }
@@ -23,8 +23,8 @@ pipeline {
         stage('Compilar aplicación') {
             steps {
                 dir(APP_DIR) {
-                    // Comandos para construir la aplicación, si es necesario
-                    sh './mvnw clean install'  // o cualquier otro comando para compilar la app
+                    // Comandos para construir la aplicación usando Gradle
+                    sh './gradlew clean build'  // Ejecuta la construcción de la app con Gradle
                 }
             }
         }
@@ -32,8 +32,8 @@ pipeline {
         stage('Ejecutar pruebas') {
             steps {
                 dir(TEST_DIR) {
-                    // Ejecutar pruebas desde el proyecto de tests
-                    sh './mvnw test'  // Aquí se ejecutarán las pruebas
+                    // Ejecutar pruebas desde el proyecto de tests usando Gradle
+                    sh './gradlew test'  // Ejecuta las pruebas usando Gradle
                 }
             }
         }
@@ -41,8 +41,8 @@ pipeline {
         stage('Generar reportes') {
             steps {
                 dir(TEST_DIR) {
-                    // Generar reportes Cucumber, por ejemplo
-                    sh './mvnw verify'  // Verificar y generar reportes
+                    // Generar reportes desde el proyecto de pruebas usando Gradle
+                    sh './gradlew test'  // Generalmente, los reportes se generan en la fase de test
                 }
             }
         }
@@ -51,8 +51,8 @@ pipeline {
     post {
         always {
             // Publicar los reportes o cualquier cosa que necesites después de la ejecución
-            junit '**/target/surefire-reports/*.xml'  // Publicar reportes JUnit
-            cucumber '**/target/cucumber-reports/*.json'  // Publicar reportes Cucumber
+            junit '**/build/test-results/test/*.xml'  // Publicar reportes JUnit en la carpeta de resultados de Gradle
+            cucumber '**/build/reports/cucumber/*.json'  // Publicar reportes Cucumber si los tienes en tu proyecto
         }
     }
 }
