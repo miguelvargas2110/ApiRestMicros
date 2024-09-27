@@ -23,6 +23,8 @@ pipeline {
         stage('Compilar aplicación') {
             steps {
                 dir(APP_DIR) {
+                    // Asegurarse de que el script gradlew sea ejecutable
+                    sh 'chmod +x ./gradlew'  // Cambia permisos de ejecución
                     // Comandos para construir la aplicación usando Gradle
                     sh './gradlew clean build'  // Ejecuta la construcción de la app con Gradle
                 }
@@ -32,6 +34,8 @@ pipeline {
         stage('Ejecutar pruebas') {
             steps {
                 dir(TEST_DIR) {
+                    // Asegurarse de que el script gradlew sea ejecutable
+                    sh 'chmod +x ./gradlew'  // Cambia permisos de ejecución
                     // Ejecutar pruebas desde el proyecto de tests usando Gradle
                     sh './gradlew test'  // Ejecuta las pruebas usando Gradle
                 }
