@@ -29,3 +29,18 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin         # Configura la contraseña por defecto para pgAdmin
     ports:
       - "5050:80"
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    user: root
+    environment:
+      - JENKINS_OPTS=--prefix=/jenkins
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins_home:/var/jenkins_home
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+
+volumes:
+  jenkins_home:
