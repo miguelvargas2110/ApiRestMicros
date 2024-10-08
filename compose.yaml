@@ -26,6 +26,36 @@ services:
     networks:
       - mynetwork
 
+
+  dbLogs:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: logsDB
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ROOT
+    ports:
+      - "5433:5432"
+    networks:
+      - mynetwork
+
+  logs:
+    image: 1b867ae81b3ea2297c95ed3f19452116e4d3ff74274fd687a9949dd665e66d7b
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://dbLogs:5432/logsDB
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=ROOT
+    ports:
+      - "8002:8002" # Puerto para tu servicio de logs
+    depends_on:
+      - dbLogs
+    networks:
+      - mynetwork
+
+
+
   pgadmin:
     image: dpage/pgadmin4
     environment:
@@ -49,6 +79,16 @@ services:
       - "50000:50000"
     networks:
       - mynetwork
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672" # RabbitMQ
+      - "15672:15672" # RabbitMQ Management UI
+    networks:
+      - mynetwork
+
+
 
 volumes:
   jenkins_home:
