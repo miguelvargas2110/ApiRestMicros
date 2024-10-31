@@ -39,7 +39,7 @@ services:
       - mynetwork
 
   logs:
-    image: 1b867ae81b3ea2297c95ed3f19452116e4d3ff74274fd687a9949dd665e66d7b
+    image: 12821b9dc02098e6632373bbc16ecae68867c1383dba7e32ae09683cb822fefa
     build:
       context: .
       dockerfile: Dockerfile
